@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Atraso</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="shortcut icon" href="logo-helena.png" type="image/x-icon">
+</head>
+
+<body>
+   <main class="conteudo">
+  <div class="container">
+    <div class="card">
+      <header>
+    <img src="logo-helena.png" alt="">
+      <h1>Registro de Atraso</h1>
+      <p>Informe seu nome para registrar o horário de chegada</p>
+      </header>
+
+      <article>
+      <input type="text" placeholder="Seu nome" id="nome">
+      <input type="text" placeholder="Turma" id="turma">
+      </article>
+
+      <button id="btnRegistrar">Registrar</button>
+
+      <div class="mensagem" id="mensagem"></div>
+    </div>
+
+  </div>
+   </main>
+
+   <footer>
+    Desenvolvido por Phellipe Tschá
+   </footer>
+</body>
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCet24gSRWOp7cWCLyzoCxsLp8Mi-qJ4qo",
+  authDomain: "registro-atraso.firebaseapp.com",
+  databaseURL: "https://registro-atraso-default-rtdb.firebaseio.com",
+  projectId: "registro-atraso",
+  storageBucket: "registro-atraso.firebasestorage.app",
+  messagingSenderId: "157235044248",
+  appId: "1:157235044248:web:139a4a09c09d790c7995ed"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const btn = document.getElementById("btnRegistrar");
+const nome = document.getElementById("nome");
+const turma = document.getElementById("turma");
+const mensagem = document.getElementById("mensagem");
+
+btn.addEventListener("click", () => {
+
+  if (nome.value === "" || turma.value === "") {
+    mensagem.textContent = "Preencha todos os campos!";
+    mensagem.style.color = "red";
+    return;
+  }
+
+  const agora = new Date();
+  const horario = agora.getHours() + ":" +
+    (agora.getMinutes() < 10 ? "0" + agora.getMinutes() : agora.getMinutes());
+
+  push(ref(db, "atrasos"), {
+    nome: nome.value,
+    turma: turma.value,
+    horario: horario
+  });
+
+  mensagem.textContent = "Registrado com sucesso!";
+  mensagem.style.color = "green";
+
+  nome.value = "";
+  turma.value = "";
+});
+
+
+
+</script>
+
+
+</html>

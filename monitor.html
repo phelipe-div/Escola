@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel do Monitor</title>
+  <link rel="stylesheet" href="monitor.css">
+</head>
+<body>
+
+<body>
+
+<div class="painel">
+
+<div id="areaLogin">
+  <h2>Login do Monitor</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
+  <button id="btnLogin">Entrar</button>
+</div>
+
+<div id="areaSistema" style="display:none;">
+  <h2>Lista de Atrasos</h2>
+  <ul id="lista"></ul>
+  <button id="btnLogout">Sair</button>
+
+  <div id="areaSistema" style="display:none;">
+
+  <h2>Painel do Dia</h2>
+  <p>Total de atrasos hoje: <strong id="totalHoje">0</strong></p>
+
+  <ul id="lista"></ul>
+
+  <button id="btnLogout">Sair</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+</body>
+
+
+<script type="module">
+
+// 🔥 COLE AQUI SUA CONFIG DO FIREBASE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, onValue } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCet24gSRWOp7cWCLyzoCxsLp8Mi-qJ4qo",
+  authDomain: "registro-atraso.firebaseapp.com",
+  databaseURL: "https://registro-atraso-default-rtdb.firebaseio.com",
+  projectId: "registro-atraso",
+  storageBucket: "registro-atraso.firebasestorage.app",
+  messagingSenderId: "157235044248",
+  appId: "1:157235044248:web:139a4a09c09d790c7995ed"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const btnLogin = document.getElementById("btnLogin");
+const lista = document.getElementById("lista");
+
+btnLogin.addEventListener("click", () => {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  signInWithEmailAndPassword(auth, email, senha)
+    .then(() => {
+      alert("Login realizado!");
+    })
+    .catch((error) => {
+      alert("Erro no login");
+    });
+});
+
+// 🔒 Só mostra dados se estiver logado
+const areaLogin = document.getElementById("areaLogin");
+const areaSistema = document.getElementById("areaSistema");
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    areaLogin.style.display = "none";
+    areaSistema.style.display = "block";
+
+    const atrasosRef = ref(db, "atrasos");
+
+    onValue(atrasosRef, (snapshot) => {
+      lista.innerHTML = "";
+
+      snapshot.forEach((child) => {
+        const dados = child.val();
+
+        const li = document.createElement("li");
+        li.textContent =
+          dados.nome + " - " +
+          dados.turma + " - " +
+          dados.horario;
+
+        lista.appendChild(li);
+      });
+    });
+
+  } else {
+    areaLogin.style.display = "block";
+    areaSistema.style.display = "none";
+  }
+});
+const btnLogout = document.getElementById("btnLogout");
+
+btnLogout.addEventListener("click", () => {
+  signOut(auth);
+});
+
+
+
+
+
+</script>
+
+</body>
+</html>
